@@ -44,13 +44,48 @@ const UploadZone = () => {
     if (f) handleFile(f);
   }, [handleFile]);
 
-  const handleProcess = () => {
-    setProcessing(true);
-    // Simulated processing — will connect to n8n webhook
-    setTimeout(() => {
+  const handleProcess = async () => {
+    if (!file) {
+      setError("Please upload an image first.");
+      return;
+    }
+
+    try {
+      setProcessing(true);
+      setError(null);
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await fetch("/api/remove-background", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let message = "Failed to remove background. Please try again.";
+        try {
+          const data = await response.json();
+          if (data?.error) message = data.error;
+        } catch {
+          // ignore JSON parse errors
+        }
+        throw new Error(message);
+      }
+
+      const data: { image?: string } = await response.json();
+
+      if (!data.image) {
+        throw new Error("Server did not return a processed image.");
+      }
+
+      setResult(data.image);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unexpected error while processing image.";
+      setError(message);
+    } finally {
       setProcessing(false);
-      setResult(preview); // placeholder
-    }, 2500);
+    }
   };
 
   const reset = () => {
@@ -124,7 +159,19 @@ const UploadZone = () => {
               </Button>
             ) : (
               <>
-                <Button variant="gradient" size="lg">
+                <Button
+                  variant="gradient"
+                  size="lg"
+                  onClick={() => {
+                    if (!result) return;
+                    const link = document.createElement("a");
+                    link.href = result;
+                    link.download = "snapcut-background-removed.png";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
                   <Download className="w-4 h-4 mr-1" /> Download
                 </Button>
                 <Button variant="neon" size="lg" onClick={reset}>
