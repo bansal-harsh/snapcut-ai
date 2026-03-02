@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Zap, Mail, Lock } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -52,7 +55,18 @@ const Login = () => {
                 <Input id="password" type="password" placeholder="••••••••" className="pl-10 h-11 bg-background" value={password} onChange={e => setPassword(e.target.value)} />
               </div>
             </div>
-            <Button variant="gradient" className="w-full h-11">Sign In</Button>
+            <Button
+              variant="gradient"
+              className="w-full h-11"
+              onClick={() => {
+                if (!email.trim()) return;
+                login({ email, password });
+                navigate("/dashboard");
+              }}
+              disabled={!email.trim() || !password.trim()}
+            >
+              Sign In
+            </Button>
           </div>
         </div>
 

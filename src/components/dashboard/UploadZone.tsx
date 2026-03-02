@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import { Upload, Image, X, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import { useHistory } from "@/hooks/useHistory";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp"];
@@ -12,6 +14,8 @@ const UploadZone = () => {
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const history = useHistory(user?.email);
 
   const handleFile = useCallback((f: File) => {
     setError(null);
@@ -80,6 +84,11 @@ const UploadZone = () => {
       }
 
       setResult(data.image);
+      history.add({
+        fileName: file.name,
+        originalDataUrl: preview ?? undefined,
+        resultDataUrl: data.image,
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unexpected error while processing image.";
       setError(message);

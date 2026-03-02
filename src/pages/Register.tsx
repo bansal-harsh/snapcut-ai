@@ -1,14 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Zap, Mail, Lock, User } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -57,7 +60,18 @@ const Register = () => {
                 <Input id="password" type="password" placeholder="Min 8 characters" className="pl-10 h-11 bg-background" value={password} onChange={e => setPassword(e.target.value)} />
               </div>
             </div>
-            <Button variant="gradient" className="w-full h-11">Create Account</Button>
+            <Button
+              variant="gradient"
+              className="w-full h-11"
+              onClick={() => {
+                if (!name.trim() || !email.trim()) return;
+                register({ name, email, password });
+                navigate("/dashboard");
+              }}
+              disabled={!name.trim() || !email.trim() || !password.trim()}
+            >
+              Create Account
+            </Button>
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
