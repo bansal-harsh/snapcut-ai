@@ -64,12 +64,7 @@ This project is built with:
 
 Already deployed on Vercel.
 
-## Can I connect a custom domain to my Lovable project?
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-We will share our specific prompts and differences here:
 
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
